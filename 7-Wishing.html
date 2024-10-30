@@ -1,0 +1,277 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Happy Diwali Wishes</title>
+  <style>
+    /* Reset and body style */
+    body, html {
+      margin: 0;
+      padding: 0;
+      overflow: hidden;
+      background-color: #000;
+      color: #ffd700;
+      font-family: Arial, sans-serif;
+      text-align: center;
+    }
+
+    #canvas {
+      position: absolute;
+      top: 0;
+      left: 0;
+    }
+
+    /* Greeting section */
+    .greeting {
+      position: relative;
+      z-index: 1;
+      margin-top: 20vh;
+    }
+
+    .greeting h1 {
+      font-size: 3rem;
+      margin: 0;
+      animation: fadeIn 3s ease-in-out infinite alternate;
+    }
+
+    .shayari {
+      font-size: 1.5rem;
+      margin-top: 1rem;
+      animation: fadeIn 5s ease-in-out infinite alternate;
+    }
+
+    /* Music controls */
+    .music-controls {
+      position: relative;
+      margin-top: 2rem;
+      z-index: 1;
+    }
+
+    /* Upload section */
+    .upload-section {
+      position: relative;
+      z-index: 1;
+      margin-top: 2rem;
+      padding: 1rem;
+      background-color: rgba(255, 215, 0, 0.1);
+      border-radius: 8px;
+      max-width: 90%;
+      margin-left: auto;
+      margin-right: auto;
+    }
+
+    /* Grid layout for uploaded images */
+    .uploaded-images {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+      gap: 10px;
+      margin-top: 1rem;
+    }
+
+    .uploaded-images img {
+      width: 100%;
+      height: auto;
+      max-height: 200px;
+      border: 2px solid #ffd700;
+      border-radius: 8px;
+      transition: transform 0.3s ease, box-shadow 0.3s ease;
+    }
+
+    .uploaded-images img:hover {
+      transform: scale(1.1);
+      box-shadow: 0 0 15px rgba(255, 215, 0, 0.6);
+    }
+
+    /* Fullscreen view styling */
+    .fullscreen-view {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100vw;
+      height: 100vh;
+      background-color: rgba(0, 0, 0, 0.9);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      z-index: 2;
+      display: none;
+    }
+
+    .fullscreen-view img {
+      max-width: 90%;
+      max-height: 90%;
+      border: 3px solid #ffd700;
+      border-radius: 10px;
+    }
+
+    /* Responsive adjustments */
+    @media (max-width: 600px) {
+      .greeting h1 {
+        font-size: 2rem;
+      }
+      .shayari {
+        font-size: 1.2rem;
+      }
+    }
+
+    /* Keyframes for smooth fading */
+    @keyframes fadeIn {
+      from { opacity: 0; }
+      to { opacity: 1; }
+    }
+  </style>
+</head>
+<body>
+  <!-- Canvas for cursor interaction effect -->
+  <canvas id="canvas"></canvas>
+
+  <!-- Greeting and Shayari section -->
+  <div class="greeting">
+    <h1>Happy Diwali!</h1>
+    <p class="shayari">May this Diwali bring you joy, prosperity, and health. 🤍✨</p>
+  </div>
+
+  <!-- Music section -->
+  <div class="music-controls">
+    <audio controls autoplay loop>
+      <source src="jethalal.mp3" type="audio/mpeg">
+      <source src="mata.mp3" type="audio/mpeg">
+      Your browser does not support the audio element.
+    </audio>
+    <audio controls autoplay loop>
+      <source src="Ram.mp3" type="audio/mpeg">
+      Your browser does not support the audio element.
+    </audio>
+  </div>
+
+  <!-- Upload Section for Images -->
+  <div class="upload-section">
+    <h3>Share Your Diwali Images</h3>
+    <input type="file" id="imageUpload" accept="image/*" />
+    
+    <div class="uploaded-images" id="imageDisplay"></div>
+  </div>
+
+  <!-- Fullscreen Image View -->
+  <div class="fullscreen-view" id="fullscreenView">
+    <img src="" id="fullscreenImage" />
+  </div>
+
+  <script>
+    const canvas = document.getElementById("canvas");
+    const ctx = canvas.getContext("2d");
+
+    canvas.width = window.innerWidth;
+    canvas.height = window.innerHeight;
+
+    const particles = [];
+    const particleCount = 50;
+
+    // Particle class
+    class Particle {
+      constructor(x, y) {
+        this.x = x;
+        this.y = y;
+        this.size = Math.random() * 5 + 1;
+        this.speedX = Math.random() * 3 - 1.5;
+        this.speedY = Math.random() * 3 - 1.5;
+      }
+
+      update() {
+        this.x += this.speedX;
+        this.y += this.speedY;
+
+        // Wrap particles around edges
+        if (this.x > canvas.width) this.x = 0;
+        if (this.x < 0) this.x = canvas.width;
+        if (this.y > canvas.height) this.y = 0;
+        if (this.y < 0) this.y = canvas.height;
+      }
+
+      draw() {
+        ctx.fillStyle = "#ffd700";
+        ctx.beginPath();
+        ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
+        ctx.closePath();
+        ctx.fill();
+      }
+    }
+
+    function createParticles() {
+      for (let i = 0; i < particleCount; i++) {
+        const x = Math.random() * canvas.width;
+        const y = Math.random() * canvas.height;
+        particles.push(new Particle(x, y));
+      }
+    }
+
+    function animateParticles() {
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+      particles.forEach((particle) => {
+        particle.update();
+        particle.draw();
+      });
+
+      connectParticles();
+      requestAnimationFrame(animateParticles);
+    }
+
+    function connectParticles() {
+      for (let i = 0; i < particles.length; i++) {
+        for (let j = i; j < particles.length; j++) {
+          const dx = particles[i].x - particles[j].x;
+          const dy = particles[i].y - particles[j].y;
+          const distance = Math.sqrt(dx * dx + dy * dy);
+
+          if (distance < 100) {
+            ctx.strokeStyle = "rgba(255, 215, 0, 0.1)";
+            ctx.lineWidth = 1;
+            ctx.beginPath();
+            ctx.moveTo(particles[i].x, particles[i].y);
+            ctx.lineTo(particles[j].x, particles[j].y);
+            ctx.stroke();
+          }
+        }
+      }
+    }
+
+    window.addEventListener("mousemove", (event) => {
+      particles.push(new Particle(event.x, event.y));
+      if (particles.length > particleCount) particles.shift();
+    });
+
+    window.addEventListener("resize", () => {
+      canvas.width = window.innerWidth;
+      canvas.height = window.innerHeight;
+    });
+
+    createParticles();
+    animateParticles();
+
+    // Image upload handler
+    document.getElementById('imageUpload').addEventListener('change', function (event) {
+      const file = event.target.files[0];
+      if (file) {
+        const reader = new FileReader();
+        reader.onload = function (e) {
+          const img = document.createElement('img');
+          img.src = e.target.result;
+          img.addEventListener("click", function() {
+            document.getElementById("fullscreenView").style.display = "flex";
+            document.getElementById("fullscreenImage").src = e.target.result;
+          });
+          document.getElementById('imageDisplay').appendChild(img);
+        };
+        reader.readAsDataURL(file);
+      }
+    });
+
+    // Close fullscreen view on click
+    document.getElementById("fullscreenView").addEventListener("click", function() {
+      this.style.display = "none";
+    });
+  </script>
+</body>
+</html>
